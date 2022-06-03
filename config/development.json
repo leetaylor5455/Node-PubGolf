@@ -1,0 +1,4 @@
+{
+    "db": "mongodb://localhost/PubGolf",
+    "jwtPrivateKey": "guinness"
+}
