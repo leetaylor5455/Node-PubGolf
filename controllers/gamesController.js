@@ -62,6 +62,8 @@ exports.startNewGame_post = async (req, res) => {
 
     game = await game.save();
 
+    wss.broadcast(game);
+
     return res.send(game);
 
 }
@@ -143,6 +145,16 @@ exports.addPoints_post = async (req, res) => {
     game = await game.save();
     wss.broadcast(game);
     return res.status(200).send(game);
+}
+
+exports.deleteGame_delete = async (req, res) => {
+    console.log('delete request')
+
+    const game = await Game.deleteMany({});
+
+    if (game) return res.status(200).send('Game deleted');
+
+    return res.status(400).send('No game found to delete.');
 }
 
 function validateStartGame(req) {

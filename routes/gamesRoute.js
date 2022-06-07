@@ -29,5 +29,7 @@ router.get('/nexthole', auth, gamesController.nextHole_get);
 // }
 router.post('/addpoints', auth, gamesController.addPoints_post);
 
+// Delete game
+router.delete('/', auth, gamesController.deleteGame_delete);
 
 module.exports = router;
