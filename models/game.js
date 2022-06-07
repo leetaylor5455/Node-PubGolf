@@ -5,6 +5,7 @@ const { holeSchema } = require('./hole');
 
 const gameSchema = new mongoose.Schema({
     teams: { type: [teamSchema], default: undefined },
+    orderedTeams: { type: [teamSchema], default: undefined },
     course: courseSchema,
     currentHoleIndex: Number,
     currentHole: holeSchema,

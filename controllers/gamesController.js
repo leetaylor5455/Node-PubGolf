@@ -53,6 +53,7 @@ exports.startNewGame_post = async (req, res) => {
     game = new Game({
         course: course,
         teams: teams,
+        orderedTeams: teams,
         currentHoleIndex: 0,
         currentHole: holes[0],
         nextHole: holes[1],
@@ -68,20 +69,20 @@ exports.startNewGame_post = async (req, res) => {
 
 }
 
+// Sort teams in score order
+function compare (a, b) {
+    if (a.score > b.score) return 1;
+
+    if (a.score < b.score) return -1;
+
+    return 0;
+}
+
 exports.nextHole_get = async (req, res) => {
 
     // Not going to store games, so find single game in collection
     let game = await Game.findOne({});
     if (!game) return res.status(400).send('Game not found');
-
-    // Sort teams in score order
-    function compare (a, b) {
-        if (a.score > b.score) return 1;
-
-        if (a.score < b.score) return -1;
-
-        return 0;
-    }
 
     // If not last hole iterate to next hole
     if (!game.lastHole) {
@@ -94,17 +95,18 @@ exports.nextHole_get = async (req, res) => {
         }
 
         // Sort before going back
-        game.teams.sort(compare);
+        game.orderedTeams.sort(compare);
 
         await game.save();
         wss.broadcast(game);
         return res.status(200).send(game);
     }
-    game.teams.sort(compare);
+
+    game.orderedTeams.sort(compare);
 
     // Assign winner/loser
-    game.winner = game.teams[0];
-    game.loser = game.teams[game.teams.length-1];
+    game.winner = game.orderedTeams[0];
+    game.loser = game.orderedTeams[game.orderedTeams.length-1];
     game.complete = true;
 
     game = await game.save();
@@ -141,6 +143,8 @@ exports.addPoints_post = async (req, res) => {
     //         bestScore = team.score;
     //     }
     // })
+
+    game.orderedTeams.sort(compare);
     
     game = await game.save();
     wss.broadcast(game);
