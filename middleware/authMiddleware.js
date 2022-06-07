@@ -7,7 +7,8 @@ module.exports = (req, res, next) => {
    
     try {
         const decoded = jwt.verify(token, config.get('jwtPrivateKey'));
-        req.table = decoded;
+        req.user = decoded;
+        req.token = token;
         next();
     }
     catch(ex) {

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const holeSchema = new mongoose.Schema({
-    name: String,
+    location: String,
     drink: String,
     par: Number,
     index: Number

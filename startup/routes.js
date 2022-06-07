@@ -1,6 +1,7 @@
 const express = require('express');
 const games = require('../routes/gamesRoute');
 const auth = require('../routes/authRoute');
+const cors = require('cors');
 
 module.exports = function(app) {
     app.use(function(req, res, next) {

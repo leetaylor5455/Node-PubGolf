@@ -4,6 +4,7 @@ const Joi = require('Joi');
 const bcrypt = require('bcrypt');
 
 exports.login_post = async (req, res) => {
+    console.log(req.body);
     // Joi
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -24,6 +25,16 @@ exports.login_post = async (req, res) => {
     if (game) return res.status(200).send({ jwt: token, game: game});
 
     return res.status(200).send({ jwt: token });
+}
+
+exports.verifyJwt_get = async (req, res) => {
+    // Find game
+    let game = await Game.findOne({});
+
+    if (game) return res.status(200).send({ jwt: req.token, game: game});
+
+    // If no game, send the token back (token value applied in auth middleware)
+    return res.status(200).send({ jwt: req.token });
 }
 
 function validate(req) {

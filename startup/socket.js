@@ -1,55 +1,25 @@
-const socketIo = require('socket.io');
+const { WebSocketServer } = require('ws');
 const Game = require('../models/game');
 
-exports.socket = function(server) {
-    const io = socketIo(server, {
-        cors: {
-            origin: 'http://localhost:3000',
-            methods: ['GET', 'POST']
-        }
-    });
+exports.startupSocket = function(server) {
 
-    let interval;
+    const wss = new WebSocketServer({ server });
 
-    io.on('connection', (socket) => {
-        console.log('New client connection.');
-
-        const gameId = socket.handshake.query.data;
-        let iteration = -1;
-
-        // Routine polling of db to get data
-        if (interval) {
-            clearInterval(interval);
-        }
-        interval = setInterval(async () => { 
-            if (iteration != -2) { // code for game complete
-                iteration = await getGameDataAndEmit(socket, gameId, iteration);
-            }
-        }, 300);
-        socket.on('disconnect', () => {
-            console.log('Client disconnected.');
-            clearInterval(interval);
+    wss.broadcast = function(data) {
+        console.log('broadcast')
+        wss.clients.forEach(function each(client) {
+            client.send(JSON.stringify(data));
         });
+    }
 
+    wss.on('connection', function connection(ws) {
+        ws.on('message', async function message() {
+            
+            const game = await Game.findOne({});
+
+            wss.broadcast(game);
+        });
     });
 
-    const getGameDataAndEmit = async (socket, gameId, iteration) => {
-        const game = await Game.findById(gameId);
-
-        if (!game) return socket.emit('GameData', 'gameId invalid.');
-
-        if (game.isComplete) { 
-            socket.emit('GameData', { isComplete: true, gameId: game._id });
-            return -2;
-        }
-        
-        if (game.iteration > iteration) {
-            socket.emit('GameData', game);
-            return game.iteration;
-        }
-
-        return iteration;
-        
-
-    }
+    exports.wss = wss;
 }
