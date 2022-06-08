@@ -94,6 +94,7 @@ exports.nextHole_get = async (req, res) => {
             game.lastHole = true;
         }
 
+        game.orderedTeams = game.teams;
         // Sort before going back
         game.orderedTeams.sort(compare);
 
@@ -135,14 +136,7 @@ exports.addPoints_post = async (req, res) => {
 
     game.teams[teamIndex].score += req.body.points;
 
-    // Start best score with a high value so that first one is bound to replace it
-    // let bestScore = 999;
-    // game.teams.forEach(team => {
-    //     if (team.score < bestScore) {
-    //         team.position = 1;
-    //         bestScore = team.score;
-    //     }
-    // })
+    game.orderedTeams = game.teams;
 
     game.orderedTeams.sort(compare);
     
