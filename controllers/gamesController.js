@@ -29,14 +29,14 @@ exports.startNewGame_post = async (req, res) => {
 
     let holes = [];
 
-    req.body.course.holes.forEach(hole => {
+    req.body.course.holes.forEach((hole, index) => {
         let waterHazardProbability = Math.random();
         let waterHazard = false;
         let bunkerHazardProbability = Math.random();
         let bunkerHazard = false;
 
-        if (waterHazardProbability <= 0.33) waterHazard = true;
-        if (bunkerHazardProbability <= 0.15) bunkerHazard = true;
+        if (waterHazardProbability <= 0.6 && !holes[index-1].waterHazard) waterHazard = true;
+        if (bunkerHazardProbability <= 0.3 && !holes[index-1].bunkerHazard) bunkerHazard = true;
 
         holes.push(new Hole({ 
             location: hole.location,
