@@ -30,11 +30,21 @@ exports.startNewGame_post = async (req, res) => {
     let holes = [];
 
     req.body.course.holes.forEach(hole => {
+        let waterHazardProbability = Math.random();
+        let waterHazard = false;
+        let bunkerHazardProbability = Math.random();
+        let bunkerHazard = false;
+
+        if (waterHazardProbability <= 0.33) waterHazard = true;
+        if (bunkerHazardProbability <= 0.15) bunkerHazard = true;
+
         holes.push(new Hole({ 
             location: hole.location,
             drink: hole.drink,
             par: hole.par,
-            index: hole.index 
+            index: hole.index,
+            waterHazard: waterHazard,
+            bunkerHazard: bunkerHazard
         }));
     });
 
