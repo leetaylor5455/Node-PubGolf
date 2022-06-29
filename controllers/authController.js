@@ -7,14 +7,14 @@ exports.login_post = async (req, res) => {
     console.log(req.body);
     // Joi
     const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) return res.status(401).send(error.details[0].message);
 
     let user = await User.findOne({ username: req.body.username });
-    if (!user) return res.status(400).send('Invalid login');
+    if (!user) return res.status(401).send('Invalid login');
 
     // Compare password
     const validPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPassword) return res.status(400).send('Invalid login');
+    if (!validPassword) return res.status(401).send('Invalid login');
 
     // Generate jwt
     const token = user.generateAuthToken();
